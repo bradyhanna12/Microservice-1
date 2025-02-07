@@ -5,6 +5,14 @@
 #include <cctype>
 using namespace std;
 
+bool cancel(int input){
+    if (input = 1){
+        return true;
+    } else {
+        return false;
+    }
+}
+
 string user_choice(){
 	string choice;
     regex validChoice("[1-5]");
@@ -15,7 +23,8 @@ string user_choice(){
 			<< "2 - Add to a catalog" << endl
 			<< "3 - Remove from a catalog" << endl
 			<< "4 - Filter a catalog" << endl
-			<< "5 - Quit the program" << endl << endl;
+            << "5 - I need Help" << endl
+			<< "6 - Quit the program" << endl << endl;
 
 		// Get user input
 		getline(cin, choice);
@@ -47,47 +56,6 @@ void load_media_list(const string& filename, Catalog& catalog) {
     inFile.close();
 }
 
-// Function to add media item to the catalog
-void add_media_to_catalog(Catalog& catalog, const string& filename) {
-    string title, type;
-
-    // Ask the user for the title and type
-    cout << endl << "Enter the title of the media: ";
-    getline(cin, title);
-
-    const string validTypes[] = {"Book", "Movie", "TV", "Music"};
-    bool valid = false;
-
-    // Repeat until a valid type is entered
-    while (!valid) {
-        cout << endl << "Enter the type of the media (Book, Movie, TV, Music): ";
-        getline(cin, type);
-
-        // Check if the entered type is valid
-        for (const string& validType : validTypes) {
-            if (type == validType) {
-                valid = true;
-                break;
-            }
-        }
-
-        if (!valid) {
-            cout << "Invalid type. Please enter one of the following: Book, Movie, TV, or Music." << endl;
-        }
-    }
-
-    // Create Media object and add it to catalog
-    Media newMedia(title, type);
-    catalog.addMedia(newMedia);
-
-    // Save to file
-    catalog.saveToFile(filename, newMedia);
-
-    cout << endl << "Media added successfully!" << endl;
-}
-
-
-
 string add_extension_and_lowercase(const string& filename) {
     // Convert the entire filename to lowercase
     string lowercase_filename = filename;
@@ -117,20 +85,65 @@ string remove_extension_and_capitalize(const string& filename) {
 }
 
 void view_catalog(Catalog& my_catalog, string filename){
-	load_media_list(filename, my_catalog);
 	cout << endl << remove_extension_and_capitalize(filename) << " Contents: " << endl << endl;
     my_catalog.displayCatalog();
 }
 
 void add_to_catalog(Catalog& my_catalog, string filename){
-	load_media_list(filename, my_catalog);
-	add_media_to_catalog(my_catalog, filename);
+	string title, type;
+
+    // Ask the user for the title and type
+    cout << endl << "\nEnter the title of the media: ";
+    getline(cin, title);
+
+    const string validTypes[] = {"Book", "Movie", "TV", "Music"};
+    bool valid = false;
+
+    // Repeat until a valid type is entered
+    while (!valid) {
+        cout << endl << "\nEnter the type of the media (Book, Movie, TV, Music): ";
+        getline(cin, type);
+
+        // Check if the entered type is valid
+        for (const string& validType : validTypes) {
+            if (type == validType) {
+                valid = true;
+                break;
+            }
+        }
+
+        if (!valid) {
+            cout << "Invalid type. Please enter one of the following: Book, Movie, TV, or Music." << endl;
+        }
+    }
+
+    // Create Media object and add it to catalog
+    Media newMedia(title, type);
+    my_catalog.addMedia(newMedia);
+
+    // Save to file
+    my_catalog.saveToFile(filename, newMedia);
+
+    cout << endl << "Media added successfully!" << endl;
 }
 
 void remove_from_catalog(Catalog& my_catalog, string filename){
     string title_to_remove;
-    cout << "Enter the title of the media you want to remove: ";
+    cout << "\nEnter the title of the media you want to remove: ";
     getline(cin, title_to_remove);
+
+    int user_choice;
+    while(1){
+        cout << "\nAre you sure you want to remove " << title_to_remove << "? You can not undo this action." 
+            << "\nEnter 1 if yes and 0 if no: " << endl;
+        cin >> user_choice;
+        if (user_choice == 0) {
+            return;
+        } else {
+            break;
+        }
+    }
+
 
     // Remove the media from the catalog
     if (my_catalog.removeMedia(title_to_remove)) {
@@ -157,5 +170,11 @@ void remove_from_catalog(Catalog& my_catalog, string filename){
 }
 
 void filter_catalog(Catalog& my_catalog, string filename){
+    // Ask the user for the type to filter
+    std::string type;
+    std::cout << "\nEnter the type of media to filter (Movie, TV, Music, Book): ";
+    std::cin >> type;
 
+    // Filter and display the media
+    my_catalog.filterByType(type);
 }

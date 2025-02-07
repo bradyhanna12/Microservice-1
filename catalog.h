@@ -20,9 +20,6 @@ public:
     void display() const {
         cout << "Title: " << title << endl << "Type: " << type << endl << endl;
     }
-    bool matches(const string& t) const {
-        return title == t;
-    }
 };
 
 class Catalog {
@@ -39,13 +36,34 @@ public:
     }
     // Remove media by title
     bool removeMedia(const string& title) {
-        auto it = find_if(mediaList.begin(), mediaList.end(), 
-                          [&title](const Media& media) { return media.matches(title); });
-        if (it != mediaList.end()) {
-            mediaList.erase(it);
-            return true;  // Media was found and removed
+        // Use std::remove_if to move matching elements to the end of the vector
+        auto it = std::remove_if(mediaList.begin(), mediaList.end(),[&title](const Media& media) {
+            return media.getTitle() == title;
+        });
+
+        // Check if any elements were found to be removed
+        bool found = (it != mediaList.end());
+
+        // Erase the "removed" elements from the vector
+        mediaList.erase(it, mediaList.end());
+
+        return found;
+    }
+    // Filter and display Media objects by type
+    void filterByType(const std::string& type) const {
+        std::cout << "\nMedia of type '" << type << "':" << std::endl;
+        bool found = false;
+
+        for (const auto& media : mediaList) {
+            if (media.getType() == type) {
+                std::cout << "- " << media.getTitle() << std::endl;
+                found = true;
+            }
         }
-        return false;  // Media not found
+
+        if (!found) {
+            std::cout << "\nNo media found of type '" << type << "'." << std::endl;
+        }
     }
     // Save the catalog to a file
     void saveToFile(const string& filename, Media& media) const {
@@ -63,14 +81,17 @@ public:
     const vector<Media>& getMediaList() const {
         return mediaList;
     }
+    vector<Media>& clearMediaList() {
+        mediaList.clear();
+        return mediaList;
+    }
 };
 
-
+bool cancel(int input);
 string user_choice();
-void add_media_to_catalog(Catalog& catalog, const string& filename);
 string add_extension_and_lowercase(const string& filename);
 string remove_extension_and_capitalize(const string& filename);
-void loadMediaList(const string& filename, vector<Media>& mediaList);
+void load_media_list(const string& filename, Catalog& catalog);
 void view_catalog(Catalog& my_catalog, string filename);
 void add_to_catalog(Catalog& my_catalog, string filename);
 void remove_from_catalog(Catalog& my_catalog, string filename);
