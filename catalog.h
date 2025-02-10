@@ -12,11 +12,16 @@ using namespace std;
 class Media {
 private:
     string title;
-    string type;  // e.g., Movie, Book, Music
+    string type;  // e.g., Movie, Book, Music, TV
 public:
-    Media(string title, string type) : title(title), type(type){}
+    Media(string title, string type) : title(title), type(type){} // Constructor
+    // Getter functions
     string getTitle() const { return title; }
     string getType() const { return type; }
+    /*
+    * Function: display
+    * Description: Displays the media title and type
+    */
     void display() const {
         cout << "Title: " << title << endl << "Type: " << type << endl << endl;
     }
@@ -26,18 +31,34 @@ class Catalog {
 private:
     vector<Media> mediaList;
 public:
+    /*
+    * Function: addMedia
+    * Description: Adds a media item to the mediaList
+    * Parameters: 
+    *   (const Media&) media: the media object to add
+    */
     void addMedia(const Media &media) {
         mediaList.push_back(media);
     }
+    /*
+    * Function: displayCatalog
+    * Description: Displays the media title and type for every item in the Catalog
+    */
     void displayCatalog() const {
         for (const auto &media : mediaList) {
             media.display();
         }
     }
-    // Remove media by title
+    /*
+    * Function: removeMedia
+    * Description: Removes a media item from the mediaList
+    * Parameters: 
+    *   (const string&) title: the title of the media to remove
+    * Returns (bool): A boolean identifying whether a media item was sucessfully removed
+    */
     bool removeMedia(const string& title) {
         // Use std::remove_if to move matching elements to the end of the vector
-        auto it = std::remove_if(mediaList.begin(), mediaList.end(),[&title](const Media& media) {
+        auto it = remove_if(mediaList.begin(), mediaList.end(),[&title](const Media& media) {
             return media.getTitle() == title;
         });
 
@@ -49,23 +70,36 @@ public:
 
         return found;
     }
-    // Filter and display Media objects by type
-    void filterByType(const std::string& type) const {
-        std::cout << "\nMedia of type '" << type << "':" << std::endl;
+    /*
+    * Function: filterByType
+    * Description: Filters the mediaList by type and displays its information
+    * Parameters: 
+    *   (const string&) type: the type of media to filter for
+    */
+    void filterByType(const string& type) const {
+        cout << "\nMedia of type '" << type << "':" << endl;
         bool found = false;
 
+        // Loop through all media and match the correct type
         for (const auto& media : mediaList) {
             if (media.getType() == type) {
-                std::cout << "- " << media.getTitle() << std::endl;
+                cout << "- " << media.getTitle() << endl;
                 found = true;
             }
         }
 
+        // If there is no media of that type, inform the user
         if (!found) {
-            std::cout << "\nNo media found of type '" << type << "'." << std::endl;
+            cout << "\nNo media found of type '" << type << "'." << endl;
         }
     }
-    // Save the catalog to a file
+    /*
+    * Function: saveToFile
+    * Description: Saves a media item to the catalog file
+    * Parameters: 
+    *   (const string&) filename: the name of the file containing the media information
+    *   (Media&) media: The media object
+    */
     void saveToFile(const string& filename, Media& media) const {
         ofstream outFile(filename, ios::app);  // Open in append mode to not overwrite
         if (outFile) {
@@ -81,13 +115,13 @@ public:
     const vector<Media>& getMediaList() const {
         return mediaList;
     }
+    // Clear the media list
     vector<Media>& clearMediaList() {
         mediaList.clear();
         return mediaList;
     }
 };
 
-bool cancel(int input);
 string user_choice();
 string add_extension_and_lowercase(const string& filename);
 string remove_extension_and_capitalize(const string& filename);

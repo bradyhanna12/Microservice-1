@@ -13,14 +13,16 @@ string get_file(){
 	string filename;
 	bool valid = false;
 
+    // Run until a valid filename is entered
     while (!valid) {
+        // Get the users input
         cout << "\nPlease enter Catalog or Wishlist: " << endl;
         getline(cin, filename);
 
         // Check if the filename is valid
-        if (filename == "Catalog" || filename == "Wishlist") {
+        if (filename == "Catalog" || filename == "Wishlist" || filename == "10") {
             valid = true;  // Filename is valid, exit loop
-        } else {
+        } else{
             cout << "Invalid input. Please enter either Catalog or Wishlist" << endl;
         }
     }
@@ -29,6 +31,7 @@ string get_file(){
 }
 
 void help(){
+    // Output help for the user
     cout << "\nHelp Page:" << endl;
     cout << "\n1. When prompted for Wishlist or Catalog, enter which you would like to interact with." << endl;
     cout << "2. To add to your catalog or wishlist, select 2 and enter the title and type of media you wish to add." << endl;
@@ -40,29 +43,39 @@ void help(){
 }
 
 int main(){
+// System introduction and explanation.
 cout << "Welcome to Media Storage" << endl;
 cout << "\nThis system allows you to keep track of movies, books, tv, and music that you have interacted with or wish to interact with." << endl;
 
 
 Catalog my_catalog;
 
+// Run until the user chooses to quit the program
 while(1){
+    // Get the users choice of acton
     string choice_s = user_choice();
+    int choice = stoi(choice_s);
     
-    if (choice_s == "6") {
-         cout << "Exiting program." << endl;
-         return 0;
-    } else if (choice_s == "5"){
+    // If the user chooses to quit, then return from main.
+    if (choice == 6) {
+        cout << "Exiting program." << endl;
+        return 0;
+    } else if (choice == 5){ // If the user needs help, output help and reprompt for user choice
         help();
         continue;
     }
 
-    int choice = stoi(choice_s);
-
+    // Make sure media information is clear
     my_catalog.clearMediaList();
+    // Get the file the user wants to interact with
     string filename = get_file();
+    if (filename == "10"){ // Return home
+        continue;
+    }
     filename = add_extension_and_lowercase(filename);
+    // Load media information
     load_media_list(filename, my_catalog);
+    // Go to the users choice
     switch (choice) {
         case 1:
             view_catalog(my_catalog, filename);
